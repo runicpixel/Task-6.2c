@@ -1,0 +1,78 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                git branch: 'main', url: 'https://github.com/runicpixel/Task-6.2c.git'
+                echo 'Installing necessary dependencies...'
+                echo 'Building the React application...'
+            }
+        }
+        stage('Unit Tests') {
+            steps {
+                echo 'Executing unit tests...'
+            }
+        }
+        stage('Code Analysis') {
+            steps {
+                echo 'No specific code analysis step for this project.'
+            }
+        }
+        stage('Deploy to Staging') {
+            steps {
+                echo 'No specific staging deployment step for this project.'
+            }
+        }
+        stage('Integration Tests on Staging') {
+            steps {
+                echo 'No specific staging integration tests step for this project.'
+            }
+        }
+        stage('Deploy to Production') {
+            steps {
+                echo 'No specific production deployment step for this project.'
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                def powershellCommand = """
+                    \$SMTPServer = "smtp.gmail.com"
+                    \$SMTPFrom = "hardik.mittal453@gmail.com"
+                    \$SMTPTo = "hardik.mittal453@gmail.com"
+                    \$SMTPSubject = "Successfully Executed!"
+                    \$SMTPBody = "Pipeline has been successfully executed."
+                    \$SMTPUsername = "hardik.mittal453@gmail.com"
+                    \$SMTPPassword = "fiya lhnd vnqo dgvj"
+
+                    Send-MailMessage -From \$SMTPFrom -to \$SMTPTo -Subject \$SMTPSubject -Body \$SMTPBody -SmtpServer \$SMTPServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$SMTPUsername, (ConvertTo-SecureString -AsPlainText \$SMTPPassword -Force))
+                """
+                powershell(powershellCommand)
+            }
+            
+            echo 'SUCCESS!'
+        }
+        failure {
+           
+            script {
+               
+                def powershellCommand = """
+                    \$SMTPServer = "smtp.gmail.com"
+                    \$SMTPFrom = "hardik.mittal453@gmail.com"
+                    \$SMTPTo = "hardik.mittal453@gmail.com"
+                    \$SMTPSubject = "FAILURE"
+                    \$SMTPBody = "Pipeline failed to execute, errors occured"
+                    \$SMTPUsername = "hardik.mittal453@gmail.com"
+                    \$SMTPPassword = "fiya lhnd vnqo dgvj"
+    
+                    Send-MailMessage -From \$SMTPFrom -to \$SMTPTo -Subject \$SMTPSubject -Body \$SMTPBody -SmtpServer \$SMTPServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$SMTPUsername, (ConvertTo-SecureString -AsPlainText \$SMTPPassword -Force))
+                """
+                powershell(powershellCommand)
+            }
+            echo 'FAILED, check.'
+        }
+    }
+}
